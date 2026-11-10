@@ -1,0 +1,307 @@
+﻿<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Лікарня</title>
+  <style>
+    :root {
+      --bg: #f4f6fa;
+      --surface: #ffffff;
+      --text: #1f2937;
+      --muted: #6b7280;
+      --accent: #0f766e;
+      --accent-soft: #ccfbf1;
+      --border: #e5e7eb;
+      --row-alt: #f9fafb;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: "Segoe UI", Roboto, Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+    }
+
+    header {
+      background: var(--accent);
+      color: #fff;
+      padding: 24px 16px;
+      text-align: center;
+    }
+
+    header h1 { margin: 0 0 4px; font-size: 1.8rem; }
+    header p  { margin: 0; opacity: 0.85; }
+
+    main {
+      max-width: 1200px;
+      margin: 24px auto;
+      padding: 0 16px;
+    }
+
+    /* ---------- Таби ---------- */
+    .tabs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+      border-bottom: 2px solid var(--border);
+    }
+
+    .tab {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 8px 8px 0 0;
+      background: transparent;
+      color: var(--muted);
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      margin-bottom: -2px;
+      border-bottom: 2px solid transparent;
+      transition: background 0.2s, color 0.2s;
+    }
+
+    .tab:hover { background: var(--accent-soft); color: var(--accent); }
+
+    .tab.active {
+      background: var(--surface);
+      color: var(--accent);
+      border-bottom-color: var(--accent);
+    }
+
+    .tab-panel {
+      display: none;
+      background: var(--surface);
+      border-radius: 0 0 8px 8px;
+      padding: 20px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+    }
+
+    .tab-panel.active { display: block; }
+
+    .tab-panel h2 { margin-top: 0; color: var(--accent); }
+    .tab-panel .hint { color: var(--muted); margin-top: -8px; }
+
+    /* ---------- Таблиці ---------- */
+    .table-wrap { overflow-x: auto; }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.95rem;
+    }
+
+    th, td {
+      padding: 10px 12px;
+      border: 1px solid var(--border);
+      text-align: left;
+      vertical-align: top;
+    }
+
+    th {
+      background: var(--accent);
+      color: #fff;
+      white-space: nowrap;
+    }
+
+    tbody tr:nth-child(even) { background: var(--row-alt); }
+    tbody tr:hover { background: var(--accent-soft); }
+
+    td.num { text-align: right; white-space: nowrap; }
+
+    td.nowrap { white-space: nowrap; }
+
+    /* ---------- Заголовок панелі з кнопкою ---------- */
+    .panel-head {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .btn {
+      padding: 10px 18px;
+      border: 1px solid transparent;
+      border-radius: 8px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s, filter 0.2s;
+    }
+
+    .btn-primary { background: var(--accent); color: #fff; }
+    .btn-primary:hover { filter: brightness(1.1); }
+
+    .btn-secondary { background: var(--surface); color: var(--text); border-color: var(--border); }
+    .btn-secondary:hover { background: var(--row-alt); }
+
+    /* Щойно доданий рядок підсвічується */
+    tbody tr.new-row { animation: highlight 2s ease-out; }
+    @keyframes highlight { from { background: #99f6e4; } to { background: transparent; } }
+
+    /* ---------- Попап з формою ---------- */
+    dialog {
+      width: min(640px, calc(100% - 32px));
+      max-height: calc(100% - 32px);
+      padding: 0;
+      border: none;
+      border-radius: 12px;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.25);
+      color: var(--text);
+    }
+
+    dialog::backdrop { background: rgba(15, 23, 42, 0.5); }
+
+    .dialog-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 20px;
+      background: var(--accent);
+      color: #fff;
+    }
+
+    .dialog-head h3 { margin: 0; font-size: 1.2rem; }
+
+    .close-btn {
+      border: none;
+      background: transparent;
+      color: #fff;
+      font-size: 1.6rem;
+      line-height: 1;
+      cursor: pointer;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 14px 16px;
+      padding: 20px;
+    }
+
+    .field { display: flex; flex-direction: column; gap: 4px; }
+    .field.wide { grid-column: 1 / -1; }
+
+    .field label { font-size: 0.85rem; font-weight: 600; }
+    .field label .req { color: #dc2626; }
+
+    .field input,
+    .field select {
+      padding: 9px 10px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font: inherit;
+      background: #fff;
+    }
+
+    .field input:focus,
+    .field select:focus {
+      outline: 2px solid var(--accent-soft);
+      border-color: var(--accent);
+    }
+
+    .field.invalid input,
+    .field.invalid select { border-color: #dc2626; }
+
+    .field .error { min-height: 1em; color: #dc2626; font-size: 0.8rem; }
+
+    .dialog-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+      padding: 16px 20px;
+      border-top: 1px solid var(--border);
+    }
+
+    footer {
+      text-align: center;
+      color: var(--muted);
+      padding: 16px;
+      font-size: 0.9rem;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>Лікарня</h1>
+  <p>Інформаційна система: лікарі, пацієнти, відділення</p>
+</header>
+
+<main>
+  <!-- Перемикачі табів -->
+  <div class="tabs" role="tablist">
+    <button class="tab active" role="tab" aria-selected="true"  aria-controls="doctors"     data-tab="doctors">Лікарі</button>
+    <button class="tab"        role="tab" aria-selected="false" aria-controls="patients"    data-tab="patients">Пацієнти</button>
+    <button class="tab"        role="tab" aria-selected="false" aria-controls="departments" data-tab="departments">Відділення</button>
+  </div>
+
+  <!-- ===================== Таблиця 1: Лікарі ===================== -->
+  <section id="doctors" class="tab-panel active" role="tabpanel">
+    <div class="panel-head">
+      <div>
+        <h2>Лікарі</h2>
+        <p class="hint">Медичний персонал лікарні</p>
+      </div>
+      <button class="btn btn-primary add-btn" data-entity="doctors">+ Додати лікаря</button>
+    </div>
+    <div class="table-wrap">
+      <table id="doctors-table"></table>
+    </div>
+  </section>
+
+  <!-- ===================== Таблиця 2: Пацієнти ===================== -->
+  <section id="patients" class="tab-panel" role="tabpanel">
+    <div class="panel-head">
+      <div>
+        <h2>Пацієнти</h2>
+        <p class="hint">Пацієнти, що перебувають на лікуванні</p>
+      </div>
+      <button class="btn btn-primary add-btn" data-entity="patients">+ Додати пацієнта</button>
+    </div>
+    <div class="table-wrap">
+      <table id="patients-table"></table>
+    </div>
+  </section>
+
+  <!-- ===================== Таблиця 3: Відділення ===================== -->
+  <section id="departments" class="tab-panel" role="tabpanel">
+    <div class="panel-head">
+      <div>
+        <h2>Відділення</h2>
+        <p class="hint">Структурні підрозділи лікарні</p>
+      </div>
+      <button class="btn btn-primary add-btn" data-entity="departments">+ Додати відділення</button>
+    </div>
+    <div class="table-wrap">
+      <table id="departments-table"></table>
+    </div>
+  </section>
+</main>
+
+<!-- ===================== Попап з формою додавання =====================
+     Поля форми генеруються в script.js відповідно до обраної сутності -->
+<dialog id="add-dialog">
+  <form id="add-form" novalidate>
+    <div class="dialog-head">
+      <h3 id="dialog-title">Додати запис</h3>
+      <button type="button" class="close-btn" id="dialog-close" aria-label="Закрити">&times;</button>
+    </div>
+    <div class="form-grid" id="form-fields"></div>
+    <div class="dialog-actions">
+      <button type="button" class="btn btn-secondary" id="dialog-cancel">Скасувати</button>
+      <button type="submit" class="btn btn-primary">Зберегти</button>
+    </div>
+  </form>
+</dialog>
+
+<footer>Завдання №1–2 — предметна область «Лікарня»</footer>
+
+<script src="script02.js"></script>
+
+</body>
+</html>
